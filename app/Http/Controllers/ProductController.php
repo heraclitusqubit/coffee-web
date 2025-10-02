@@ -15,11 +15,36 @@ class ProductController extends Controller
     //     $this->middleware('auth')->except(['index','show']);
     // }
 
-    public function index()
+    // public function index()
+    // {
+    //     $products = Product::latest()->paginate(12);
+    //     return view('admin.products.index', compact('products'));
+    // }
+    
+    public function index(Request $request)
     {
-        $products = Product::latest()->paginate(12);
-        return view('admin.products.index', compact('products'));
+        $query = Product::query();
+
+        // search
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        // filter kategori
+        if ($request->has('category') && $request->category != '') {
+            $query->where('category_id', $request->category);
+        }
+
+        $products = $query->paginate(12);
+        $categories = Category::all();
+
+        return view('admin.products.index', compact('products', 'categories'));
     }
+
 
     public function create()
     {

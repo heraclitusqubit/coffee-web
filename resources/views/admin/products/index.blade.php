@@ -7,6 +7,31 @@
         <h1>Produk</h1>
         <a href="{{ route('admin.products.create') }}" class="btn btn-primary">Tambah Produk</a>
     </div>
+<form action="{{ route('admin.products.index') }}" method="GET" class="flex gap-2 mb-4">
+    <!-- Search -->
+    <input 
+        type="text" 
+        name="search" 
+        value="{{ request('search') }}" 
+        placeholder="Cari produk..." 
+        class="border rounded p-2 w-1/3"
+    >
+
+    <!-- Filter kategori -->
+    <select name="category" class="border rounded p-2">
+        <option value="">Semua Kategori</option>
+        @foreach($categories as $category)
+            <option value="{{ $category->id }}" 
+                {{ request('category') == $category->id ? 'selected' : '' }}>
+                {{ $category->name }}
+            </option>
+        @endforeach
+    </select>
+
+    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">
+        Filter
+    </button>
+</form>
 
     <table class="table table-striped">
         <thead>

@@ -11,7 +11,7 @@ class CheckoutController extends Controller
     public function form()
     {
         $cart = session()->get('cart', []);
-        if(count($cart) == 0){
+        if (count($cart) == 0) {
             return redirect()->route('cart.index')->with('error', 'Cart kosong!');
         }
         return view('checkout.form', compact('cart'));
@@ -26,12 +26,12 @@ class CheckoutController extends Controller
         ]);
 
         $cart = session()->get('cart', []);
-        if(count($cart) == 0){
+        if (count($cart) == 0) {
             return redirect()->route('cart.index');
         }
 
         $total = 0;
-        foreach($cart as $item){
+        foreach ($cart as $item) {
             $total += $item['price'] * $item['qty'];
         }
 
@@ -41,14 +41,17 @@ class CheckoutController extends Controller
             'customer_address' => $request->customer_address,
             'customer_phone' => $request->customer_phone,
             'total' => $total,
-            'status' => 'pending'
+            'status' => 'pending',
+            'discount'        => $request->discount ?? 0,
+            'shipping_cost'   => $request->shipping_cost ?? 0,
         ]);
 
         // simpan item
-        foreach($cart as $id => $item){
+        foreach ($cart as $item) {
             OrderItem::create([
                 'order_id' => $order->id,
-                'product_id' => $id,
+                'product_id' => $item['id'],
+                'variant'    => $item['variant'],
                 'qty' => $item['qty'],
                 'price' => $item['price']
             ]);
@@ -57,6 +60,6 @@ class CheckoutController extends Controller
         // kosongkan cart
         session()->forget('cart');
 
-        return redirect()->route('landing')->with('success', 'Pesanan berhasil dibuat!');
+        return redirect()->route('landing.index')->with('success', 'Pesanan berhasil dibuat!');
     }
 }

@@ -14,11 +14,12 @@ class OrderController extends Controller
         return view('admin.orders.index', compact('orders'));
     }
 
-    public function show(Order $order)
+    public function show($id)
     {
-        $order->load('items.product');
+        $order = Order::with('items.product')->findOrFail($id);
         return view('admin.orders.show', compact('order'));
     }
+
 
     public function edit(Order $order)
     {
